@@ -241,6 +241,7 @@ fingerUp = function(e){
             orphan(b,parent);
             //b is now not attached to the heirarchy
             var inside = whichbox(xy.x,xy.y)[0];
+            console.log(inside);
             if (parent == inside) {
                 console.log('still in parent');
                 parent.cs.push(b); //add it back
