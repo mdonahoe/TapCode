@@ -233,6 +233,7 @@ fingerUp = function(e){
         if (touch.identifier==undefined) continue;
         finger = fingers[touch.identifier];
         if (finger.grab) {
+            console.log('releasing the grab');
             //see where this box is relative to its parent
             var b = finger.grab;
             var xy = getcoords(finger);
@@ -241,10 +242,11 @@ fingerUp = function(e){
             //b is now not attached to the heirarchy
             var inside = whichbox(xy.x,xy.y);
             if (parent == inside) {
+                console.log('still in parent');
                 parent.cs.push(b); //add it back
                 continue;
             }
-
+            inside.style = randomstyle();
             inside.cs.push(b);
             //add or remove
 
