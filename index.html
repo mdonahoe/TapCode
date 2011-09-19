@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-<script src="zuibox.js"></script>
+<script src="boxes.js"></script>
 <style>
 body {
     padding:0;
@@ -10,11 +10,6 @@ body {
 </style>
 <title>boxes</title>
 </head>
-<body
-    onload="ready()"
-    ontouchmove="fingerMove(event)"
-    ontouchend="fingerUp(event)"
-    ontouchstart="fingerStart(event)">
-<canvas height=400 width=400 id=x></canvas>
-<div id=output></div>
-</body>
+<body>
+    <canvas height=400 width=400 id=x></canvas>
+    <div id=output></div>
