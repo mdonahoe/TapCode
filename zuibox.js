@@ -72,49 +72,6 @@ var drawbox = function(b){
 var box = makebox(.5,.5,.5);
 box.cs.push(makebox(.25,.5,.5));
 
-key = function (e) {
-    var px = mx*m+dx;
-    var py = my*m+dy;
-
-    var b = whichbox(px,py);
-    if (b) b[0].style = randomstyle();
-
-    if (e.which==83){
-        m = m*1.11;
-    }
-
-    if (e.which==87){
-        m=m*.9;
-    }
-
-    dx = px - mx*m;
-    dy = py - my*m;
-
-
-    if (e.which==84){
-        if (b){
-            b[0].cs.push(makebox(b[1],b[2],.5));
-        }
-    }
-    if (0){
-
-        var nextbox = box.cs[0];
-        px = box.x+nextbox.x*box.s;
-        py = box.y+nextbox.y*box.s;
-        var mm = box.s;
-        box = nextbox;
-        box.s = mm*box.s/m;
-        box.x = (px-dx)/m;
-        box.y = (py-dy)/m;
-        m=1;dx=0;dy=0;
-    }
-    drawscreen();
-    if (e.which==65){
-        mouseto(mx,my);
-    }
-    gg('output').innerHTML=m+' '+dx+' '+dx+'<br>'+mx+' '+my;
-}
-
 drawscreen = function(){
     square();
     ctx.save();
@@ -122,34 +79,6 @@ drawscreen = function(){
     ctx.translate(-dx,-dy);
     drawbox(box);
     ctx.restore();
-}
-
-mouseto = function(x,y){
-    //creates a box inside the enclosing box
-    ctx.translate(x,y);
-    ctx.scale(.1,.1);
-    square();
-}
-
-move = function(e){
-    mx = e.clientX/canvasWidth;
-    my = e.clientY/canvasHeight;
-    if (grabbed){
-        var p = getmousecoords(grabbed[0]);
-        grabbed[0].x = p.x - grabbed[1]*grabbed[0].s;
-        grabbed[0].y = p.y - grabbed[2]*grabbed[0].s;
-        drawscreen();
-    }
-}
-
-mousedown = function(event){
-    var px = mx*m+dx;
-    var py = my*m+dy;
-    grabbed = whichbox(px,py);
-}
-
-mouseup = function(event){
-    grabbed = undefined;
 }
 
 whichbox = function(x,y,tbox){
@@ -178,6 +107,7 @@ whichbox = function(x,y,tbox){
     //return ourselves
     return [tbox,x,y];
 }
+
 findbox = function(b,cbox){
     //returns a list from box to b (not including b)
     if (cbox==undefined) cbox = box;
@@ -191,6 +121,7 @@ findbox = function(b,cbox){
     if (p) return [cbox].concat(p);
     return 0;
 }
+
 getcoords = function(v,rbox){
 
     //convert canvasview coord to root coords
@@ -243,7 +174,7 @@ reduce = function(f,xs,val) {
     }
     return val;
 }
-function fingerStart(e){
+fingerStart = function(e){
     e.preventDefault();
     for (var t in e.changedTouches){
         var touch = e.changedTouches[t];
@@ -266,7 +197,8 @@ countfingers = function(){
     }
     return i;
 }
-function fingerMove(e){
+
+fingerMove = function(e){
     e.preventDefault();
     //e.changedTouches
     //touch: identifier,pageX,pageY
@@ -284,17 +216,51 @@ function fingerMove(e){
             drawscreen();
         }
     }
-    if (countfingers()==2) movezoom();
+    if (countfingers()==2) {
+        movezoom();
+        //no touching while zooming
+        for (var i in fingers){
+            fingers[i].grab = undefined;
+        }
+    }
     return false;
 }
-function fingerUp(e){
+
+fingerUp = function(e){
     e.preventDefault();
     for (var t in e.changedTouches){
         var touch = e.changedTouches[t];
         if (touch.identifier==undefined) continue;
+        finger = fingers[touch.identifier];
+        if (finger.grab) {
+            //see where this box is relative to its parent
+            var b = finger.grab;
+            var xy = getcoords(finger);
+            var parent = findbox(b);
+            orphan(b,parent);
+            //b is now not attached to the heirarchy
+            var inside = whichbox(xy.x,xy.y);
+            if (parent == inside) {
+                parent.cs.push(b); //add it back
+                continue;
+            }
+
+            inside.cs.push(b);
+            //add or remove
+
+        }
         delete fingers[touch.identifier];
     }
     return false;
+}
+
+orphan = function(child,parent){
+    var cs = [];
+    for (var i in parent.cs){
+        var c = parent.cs[i];
+        if (c!=child) cs.push(c);
+    }
+    parent.cs = cs;
 }
 
 dist = function(a,b){
@@ -351,3 +317,21 @@ pointinsideboxes = function(p,b){
     return [{b:b,x:p.x,y:p.y}].concat(bs);
     //sorted by box draw order (ie, the last box to be drawn is the last in the array)
 }
+
+
+/*
+Read
+
+As far as I can tell:
+
+1. this is a zui
+2. it has boxes
+3. boxes have x,y,scale (relative to parent)
+
+
+
+
+
+
+*/
+
