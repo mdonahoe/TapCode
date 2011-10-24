@@ -1,13 +1,15 @@
-function Box(parent,x,y,s){
+function Box(parent,x,y,s,f){
     this.parent = parent
     parent.bs.push(this);
     if (x==undefined) x=.25;
     if (y==undefined) y=.25;
     if (s==undefined) s=.5;
+    if (f==undefined) f=(function(){return 1.0;});  //style function
     this.x = x
     this.y = y;
     this.s = s;
-    this.bs = []
+    this.f = f;
+    this.bs = [];
     this.style = randomstyle();
 }
 Box.prototype.set_parent = function(parent){
@@ -29,6 +31,7 @@ Box.prototype.set_parent = function(parent){
 Box.prototype.draw = function(){
     ctx.save();
     ctx.fillStyle = this.style;
+    ctx.fillStyle = 'rgb('+this.f(this)*255 + ',10,10)';
     ctx.translate(this.x,this.y);
     ctx.scale(this.s,this.s);
     square();
@@ -233,7 +236,6 @@ fingerUp = function(e){
 
             root.draw();
         }
-        console.log('toast');
         delete root.fingers[touch.identifier];
     }
     return false;
@@ -282,6 +284,8 @@ red = 'rgb(255,0,0)';
 green = 'rgb(0,255,0)';
 
 function square(){
+    ctx.strokeStyle = 'rgb(255,255,255)';
+    ctx.lineWidth = .01;
     ctx.beginPath();
     ctx.moveTo(0,0);
     ctx.lineTo(0,1);
@@ -289,6 +293,7 @@ function square(){
     ctx.lineTo(1,0);
     ctx.closePath();
     ctx.fill();
+    ctx.stroke();
 }
 
 // <---------------------
@@ -331,9 +336,23 @@ var ctx;
 window.onload = function(){
 
     root = new Root(); //must be named root. (and global)
-    var box1 = new Box(root, .25, .25, .5);
+    var box1 = new Box(root, .25, .25, .5,function(box){
+        //sum the styles of the children
+        var s = 0;
+        for (var i in box.bs){
+            var c = box.bs[i];
+            s+=c.f(c);
+        }
+        if (box.bs.length>0 ){
+            l = box.bs.length;
+        } else {
+            l = 1;
+        }
+        console.log('c = '+(s/l));
+        return s / l;
+    });
     var box2 = new Box(box1, .25, .25, .5);
-    var other = new Box(root, .5, .5, .5);
+    var other = new Box(root, .5, .5, .5,function(){ return 0.0;});
 
     gg('x').addEventListener('touchstart', fingerStart, false);
     gg('x').addEventListener('touchmove', fingerMove, false);
