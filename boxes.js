@@ -24,7 +24,6 @@ Box.prototype.set_parent = function(parent){
     }
 
     this.parent = parent;
-    console.log(parent);
     //move in with new parent
     if (parent) this.parent.bs.unshift(this);
 }
@@ -35,6 +34,12 @@ Box.prototype.draw = function(){
     ctx.translate(this.x,this.y);
     ctx.scale(this.s,this.s);
     square();
+    ctx.save();
+    ctx.scale(1.0/100,1.0/100);
+    if (this.img){
+        ctx.drawImage(this.img,0,0);
+    }
+    ctx.restore();
     for (var i=this.bs.length;i>0;i--){
         this.bs[i-1].draw();
     }
@@ -103,7 +108,6 @@ mouseDown = function(e){
     finger.y = e.clientY/canvasHeight;
     var p = root.coordinates(finger);
     finger.grab = whichbox(p.x,p.y);
-    console.log(finger.grab);
     root.fingers['mouse'] = finger;
 }
 mouseMove = function(e){
@@ -348,9 +352,10 @@ window.onload = function(){
         } else {
             l = 1;
         }
-        console.log('c = '+(s/l));
         return s / l;
     });
+    box1.img = new Image();
+    box1.img.src = 'icon.png';
     var box2 = new Box(box1, .25, .25, .5);
     var other = new Box(root, .5, .5, .5,function(){ return 0.0;});
 
