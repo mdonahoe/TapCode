@@ -340,24 +340,6 @@ var ctx;
 window.onload = function(){
 
     root = new Root(); //must be named root. (and global)
-    var box1 = new Box(root, .25, .25, .5,function(box){
-        //sum the styles of the children
-        var s = 0;
-        for (var i in box.bs){
-            var c = box.bs[i];
-            s+=c.f(c);
-        }
-        if (box.bs.length>0 ){
-            l = box.bs.length;
-        } else {
-            l = 1;
-        }
-        return s / l;
-    });
-    box1.img = new Image();
-    box1.img.src = 'icon.png';
-    var box2 = new Box(box1, .25, .25, .5);
-    var other = new Box(root, .5, .5, .5,function(){ return 0.0;});
 
     gg('x').addEventListener('touchstart', fingerStart, false);
     gg('x').addEventListener('touchmove', fingerMove, false);
@@ -373,14 +355,8 @@ window.onload = function(){
     ctx.scale(canvasWidth,canvasHeight);
     ctx.fillStyle = "black";
     square();
+    initialize(root);
     root.draw();
 }
-
-// <---------------------
-
-//START
-
-
-
-
-
+var initialize = function(root){}; //override this in other scripts
+// <---------------------------

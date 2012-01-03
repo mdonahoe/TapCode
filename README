@@ -1,1 +1,38 @@
-Im making a calculator for my iphone
+initial goal:
+    make a calculator for the iphone
+
+new goal:
+    make a simple HTML5 app
+    allow people to add images
+    drag, drop and zoom
+    have a library of starting images
+    have a shelf that stays attached to the viewport
+    make it global and networked
+    broadcast drops, not drags
+
+TODO:
+autoscale/crop images to fit the square box size
+remove border if there is an image
+Panning
+    - move small boxes, pan window when finger on a larger box.
+    - basically think of the window as a box, and panning as a force
+    - acting between the touched box and the window?
+
+The tapcode project thus far:
+I have boxes which can be dragged.
+The viewport can be zoomed.
+Boxes get placed inside other boxes and update their absolute size
+so that their relative size is the same.
+Boxes determine their display based on the contents of boxes they contain.
+
+
+Other Ideas:
+ - boxes all output numbers
+ - create a box for displaying numbers
+ - output text, stdin, stdout, UNIX style.
+
+pos
+scale
+name
+data
+image
